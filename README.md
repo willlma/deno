@@ -9,3 +9,4 @@ If you'd rather not install it, run
 ```
 deno run --allow-read --allow-write gpx.js <input.gpx> <route.gpx> <breakMins>
 ```
+To debug, you can use VSCode with the `.vscode/launch.json` config.
