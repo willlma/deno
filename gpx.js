@@ -4,7 +4,7 @@ This is for when you forgot to record part of activity.
 2. Create a route from the missing chunk and download it (only supports one pause for now)
 3. Run this script from the terminal with: \`gpx activity.gpx route.gpx\`.
 --breakMins (-b) or --start (-s) should be passed if it's in the middle or start of the activity
-`
+`;
 // TODO: take an activity ID instead of a file name (and maybe same for route)
 
 import * as flags from 'https://deno.land/std/flags/mod.ts';
@@ -21,12 +21,14 @@ class TechnicalCode {
     return { activity, breakMins, help, isStart, route };
   }
 
-  static readFilesToDocs(files) {
-    return Promise.all(files.map((file) => Deno.readTextFile(file).then(xml.parse)));
+  static readFilesToDocs(fileNames) {
+    // Accounting for https://github.com/lowlighter/xml/issues/18 (I need numbers elsewhere so can't use { reviveNumbers: false })
+    doc.xml['@version'] = '1.0';
+    return Promise.all(fileNames.map((fileName) => Deno.readTextFile(fileName).then(xml.parse)));
   }
 
   static writeFile(fileName, doc) {
-    return Deno.writeTextFile(fileName, xml.stringify(doc))
+    return Deno.writeTextFile(fileName, xml.stringify(doc));
   }
 }
 
@@ -94,7 +96,7 @@ async function fillIncompleteGpx(activity, route, breakMins, isStart) {
     const startTime = new Date(trkPts[0].time).getTime() - breakMs;
     const newTrkPts = getRouteTrackPointsWithTimes(routeTrkPts, startTime, interval);
     activityDoc.gpx.metadata.time = newTrkPts[0].time;
-    activityDoc.gpx.trk.trkseg.trkpt = [...newTrkPts, ...trkPts]
+    activityDoc.gpx.trk.trkseg.trkpt = [...newTrkPts, ...trkPts];
   } else {
     const pauseIndex = getPauseTrkPtIndex(trkPts);
     const breakEnd = new Date(breakStart.getTime() + breakMs);
