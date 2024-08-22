@@ -22,12 +22,12 @@ class TechnicalCode {
   }
 
   static readFilesToDocs(fileNames) {
-    // Accounting for https://github.com/lowlighter/xml/issues/18 (I need numbers elsewhere so can't use { reviveNumbers: false })
-    doc.xml['@version'] = '1.0';
     return Promise.all(fileNames.map((fileName) => Deno.readTextFile(fileName).then(xml.parse)));
   }
 
   static writeFile(fileName, doc) {
+    // Accounting for https://github.com/lowlighter/xml/issues/18 (I need numbers elsewhere so can't use { reviveNumbers: false })
+    doc.xml['@version'] = '1.0';
     return Deno.writeTextFile(fileName, xml.stringify(doc));
   }
 }
@@ -99,6 +99,8 @@ async function fillIncompleteGpx(activity, route, breakMins, isStart) {
     activityDoc.gpx.trk.trkseg.trkpt = [...newTrkPts, ...trkPts];
   } else {
     const pauseIndex = getPauseTrkPtIndex(trkPts);
+    // console.log('trkPts[pauseIndex]', trkPts[pauseIndex]);
+    const breakStart = new Date(trkPts[pauseIndex].time);
     const breakEnd = new Date(breakStart.getTime() + breakMs);
     const resumeTime = new Date(trkPts[pauseIndex + 1].time);
     const interval = (resumeTime.getTime() - breakEnd.getTime()) / routeTrkPts.length;
