@@ -3,7 +3,7 @@ This is for when you forgot to record part of activity.
 1. Download the activity GPX
 2. Create a route from the missing chunk and download it (only supports one pause for now)
 3. Run this script from the terminal with: \`gpx activity.gpx route.gpx\`.
---breakMins (-b) or --start (-s) should be passed if it's in the middle or start of the activity
+--breakMins (-b) or --start (-s) should be passed if it's in the middle or start of the activity, respectively.
 `;
 // TODO: take an activity ID instead of a file name (and maybe same for route)
 
@@ -27,7 +27,7 @@ class TechnicalCode {
 
   static writeFile(fileName, doc) {
     // Accounting for https://github.com/lowlighter/xml/issues/18 (I need numbers elsewhere so can't use { reviveNumbers: false })
-    doc.xml['@version'] = '1.0';
+    doc['@version'] = '1.0';
     return Deno.writeTextFile(fileName, xml.stringify(doc));
   }
 }
@@ -74,12 +74,12 @@ function getRouteTrackPointsWithTimes(routeTrkPts, startTimeMs, interval) {
     const time = new Date(startTimeMs + i * interval).toISOString();
     const trkpt = routeTrkPts[i];
     ['@lat', '@lon'].forEach((key) => {
-      trkpt[key] = trkpt[key].toFixed(6);
+      trkpt[key] = Number(trkpt[key]).toFixed(6);
     });
 
     trkPts.push({
       ...trkpt,
-      ele: trkpt.ele.toFixed(1),
+      ele: Number(trkpt.ele).toFixed(1),
       time: time.replace(/\.\d+Z$/, 'Z'),
     });
   }
