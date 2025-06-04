@@ -1,12 +1,10 @@
 const helpText = `
-This is for when you forgot to record part of activity.
-1. Download the activity GPX
-2. Create a route from the missing chunk and download it (only supports one pause for now)
-3. Run this script from the terminal with: \`gpx activity.gpx route.gpx\`.
---breakMins (-b) or --start (-s) should be passed if it's in the middle or start of the activity, respectively.
+  This script allows you to merge two GPX files when you want them to be one activiy instead of two.
+1. Download both activity GPX files
+2. Run this script from the terminal with: \`merge-gpx path/to/activity1.gpx path/to/activity2.gpx\`.
 `;
 // TODO: take an activity ID instead of a file name (and maybe same for route)
-//
+
 import { parseArgs } from "jsr:@std/cli/parse-args";
 
 const searchString = "trkseg";
@@ -34,7 +32,10 @@ function getTrackSegment(activity: string) {
 }
 
 (async function main() {
-  const { _: fileNames } = parseArgs(Deno.args);
+  const { _: fileNames, ...parsedArgs } = parseArgs(Deno.args);
+  const help = parsedArgs.h || parsedArgs.help;
+  if (help) return console.log(helpText);
+
   const [activity1, activity2] = await TechnicalCode.readFiles(fileNames);
   const trackSegment2 = getTrackSegment(activity2);
   const end1 = getTrackSegmentEnd(activity1);
@@ -44,8 +45,12 @@ function getTrackSegment(activity: string) {
     trackSegment2,
     activity1.substring(end1),
   ].join("");
-  const directory = fileNames[0].substring(0, fileNames[0].lastIndexOf("/"));
-  return TechnicalCode.writeFile(`${directory}/Merged.gpx`, result);
+  const directory = fileNames[0].substring(
+    0,
+    fileNames[0].lastIndexOf("/") + 1,
+  );
+  const fileName = `${directory}Merged.gpx`;
+  console.log("Merged GPX file is ready:", fileName);
 
-  if (help) return console.log(helpText);
+  return TechnicalCode.writeFile(fileName, result);
 })();

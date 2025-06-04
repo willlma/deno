@@ -27,6 +27,10 @@ deno install --allow-read --allow-write gpx.js
 deno install --allow-read --allow-write --allow-env clean-notes.ts
 - [ ] implement part b of the help text
 
+### Merge GPX
+
+deno install --global --allow-read --allow-write merge-gpx.ts
+
 ### Dev
 
 Every file should
