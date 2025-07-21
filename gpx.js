@@ -1,9 +1,11 @@
+const namedArgsHelp =
+  "--breakMins (-b)=x or --start (-s) should be passed if it's in the middle or start of the activity, respectively.";
 const helpText = `
 This is for when you forgot to record part of activity.
 1. Download the activity GPX
 2. Create a route from the missing chunk and download it (only supports one pause for now)
 3. Run this script from the terminal with: \`gpx activity.gpx route.gpx\`.
---breakMins (-b) or --start (-s) should be passed if it's in the middle or start of the activity, respectively.
+${namedArgsHelp}
 `;
 // TODO: take an activity ID instead of a file name (and maybe same for route)
 
@@ -116,6 +118,8 @@ async function fillIncompleteGpx(activity, route, breakMins, isStart) {
 
 (function main() {
   const { activity, breakMins, help, isStart, route } = TechnicalCode.parseArgs();
+
+  if (isNaN(breakMins) && !isStart) return console.log(namedArgsHelp);
   if (help) return console.log(helpText);
 
   fillIncompleteGpx(activity, route, breakMins, isStart);
